@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -eu -o pipefail
+set -x
 
 function cmd_pref() {
     if type -p "$2" > /dev/null; then
@@ -80,6 +81,13 @@ as --version
 ld -v
 
 HOST="$HOST" BUILD="$BUILD" WITH_PROTON="$PROTON_ARG" "$MAKE" "$@" -C ./depends/
+
+if [ "${BUILD_STAGE:-all}" = "depends" ]
+then
+  exit 0
+fi
+
 ./autogen.sh
 CONFIG_SITE="$PWD/depends/$HOST/share/config.site" ./configure "$PROTON_ARG" $CONFIGURE_FLAGS
+
 "$MAKE" "$@"
